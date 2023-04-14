@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33122.133
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LCD_Hangman", "LCD_Hangman\LCD_Hangman.vcxproj", "{C5F80730-F44F-4478-BDAE-6634EFC2CA88}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LiquidCrystal-1.0.7", "Libraries\LiquidCrystal\1.0.7\LiquidCrystal\LiquidCrystal-1.0.7.vcxitems", "{3AE05213-6674-4C39-8356-C74E210535E0}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ezButton-1.0.4", "Libraries\ezButton\1.0.4\ezButton\ezButton-1.0.4.vcxitems", "{18F6815B-579F-4027-88E4-613597593184}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Debug|x86.ActiveCfg = Debug|Win32
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Debug|x86.Build.0 = Debug|Win32
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x86.ActiveCfg = Release|Win32
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7E4AB742-09B0-4C48-A2D4-093DFEDB2CAF}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Libraries\ezButton\1.0.4\ezButton\ezButton-1.0.4.vcxitems*{18f6815b-579f-4027-88e4-613597593184}*SharedItemsImports = 9
+		Libraries\LiquidCrystal\1.0.7\LiquidCrystal\LiquidCrystal-1.0.7.vcxitems*{3ae05213-6674-4c39-8356-c74e210535e0}*SharedItemsImports = 9
+		Libraries\ezButton\1.0.4\ezButton\ezButton-1.0.4.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\LiquidCrystal\1.0.7\LiquidCrystal\LiquidCrystal-1.0.7.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+	EndGlobalSection
+EndGlobal
