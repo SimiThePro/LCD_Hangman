@@ -10,14 +10,12 @@
 
 
 #define VRx A1
-#define VRy A0
 #define SW 2
 #define LEDPIN 3
 
 #define IDLE 0x3
 
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
-ezButton button(4);
 ezButton Joystick(SW);
 
 int Fehler = 0;
@@ -119,27 +117,23 @@ byte Stage_7[8] =
 
 #pragma region Functions
 
-int PrintNumberOnLCD(LiquidCrystal lcd, int Number, int column, int row, int highestPotenz)
-{
-	
-	int potenzx = (int)log10(Number);
-	int AmountToClear = highestPotenz - potenzx;
 
-	while (AmountToClear > 0)
-	{
-		lcd.setCursor(column + highestPotenz - AmountToClear, 0);
-		lcd.print(" ");
-		AmountToClear--;
-	}
-}
-
+/**
+ * \brief Kontrolliert ob der versuchte Buchstabe im zu erratenden Wort vorkommt und ändert
+ * das zu ausgebende Wort auf dem LCD Display
+ * \param Input Der Buchstabe der Eingegeben wird
+ * \param WordToGuess Das zu erratende Wort
+ * \param HiddenWordToGuess Das Wort das auf dem LCD Display ausgegeben wird
+ * \param AvailableLetters Die Buchstaben die zur verfügung stehen
+ * \param WonGame Wenn keine '_' mehr zu finden sind: true
+ */
 void CheckForMatch(char Input,const String& WordToGuess, String& HiddenWordToGuess, String &AvailableLetters, bool &WonGame)
 {
 	bool FoundLetter = false;
 	bool IsInWord = false;
 	int remainingLetters = 0;
 
-	for (int i = 0; i < AvailableLetters.length() || FoundLetter != true; i++)
+	for (int i = 0; i < AvailableLetters.length() || FoundLetter != true; i++) //Entfernt den Buchstaben aus der Varaible AvilableLetters
 	{
 		if (AvailableLetters.charAt(i) == Input)
 		{
@@ -148,13 +142,9 @@ void CheckForMatch(char Input,const String& WordToGuess, String& HiddenWordToGue
 			AvailableLetters += RemainingLettersAfterIndex;
 			FoundLetter = true;
 		}
-		else if (AvailableLetters.charAt(i) > Input)
-		{
-
-		}
 	}
 
-	for (int i = 0; i < WordToGuess.length(); i++)
+	for (int i = 0; i < WordToGuess.length(); i++) //Sucht den BUchstaben im zu suchenden Wort
 	{
 		if (WordToGuess.charAt(i) == Input)
 		{
@@ -165,8 +155,8 @@ void CheckForMatch(char Input,const String& WordToGuess, String& HiddenWordToGue
 		
 	}
 
-	if (!IsInWord) Fehler++;
-	if (remainingLetters == 0) WonGame = true;
+	if (!IsInWord) Fehler++; //Falscher Buchstabe
+	if (remainingLetters == 0) WonGame = true; //Keine '_' mehr. Spiel ist gewonnen
 }
 
 
@@ -179,9 +169,9 @@ unsigned long currentmillis = 0;
 unsigned long letzteAenderung = 0; // der letzte Zeitpunkt, an dem eine Änderung stattfand
 unsigned long entprellZeit = 1000;   // Zeit, die der Taster-Zustand gleich bleiben soll, um einen stabilen Zustand zu erkennen
 
-String WordToGuess("FAbian");
-String HiddenWord;
-String AvailableLetters;
+String WordToGuess("Test"); //Das Wort welches erraten wird vom Benutzer
+String HiddenWord; // Wird auf dem LCD ausgegeben
+String AvailableLetters; //Wenn alle buchstaben verfügbar: a-z. Nach jeden Versuch wird der Versuchte BUchstabe gelöscht
 
 
 
@@ -189,6 +179,7 @@ String AvailableLetters;
 void setup() {
 	lcd.begin(16, 2);
 
+	//Erstellt die Hangman Zeichnung
 	lcd.createChar(1, Stage_1);
 	lcd.createChar(2, Stage_2);
 	lcd.createChar(3, Stage_3);
@@ -199,11 +190,11 @@ void setup() {
 
 	lcd.setCursor(0, 0);
 
-	button.setDebounceTime(50);
 	Joystick.setDebounceTime(50);
+
 	Serial.begin(9600);
 
-	for (int i = 0; i < WordToGuess.length(); i++)
+	for (int i = 0; i < WordToGuess.length(); i++) //Großbuchstaben werden in Kleinbuchstaben verwandelt und Hiddenword wird initialisiert
 	{
 		if (WordToGuess.charAt(i) >= 'A' && WordToGuess.charAt(i) <= 'Z')
 		{
@@ -212,10 +203,11 @@ void setup() {
 		HiddenWord += '_';
 	}
 
-	for (int i = 'a', currentindex = 0; i <= 'z'; i++, currentindex++)
+	for (int i = 'a', currentindex = 0; i <= 'z'; i++, currentindex++) //Setzt buchstaben von a-z
 	{
 		AvailableLetters += (char)i;
 	}
+
 	lcd.setCursor(0, 0);
 	lcd.print(HiddenWord);
 }
@@ -234,100 +226,72 @@ bool GameFinished = false;
 
 // the loop function runs over and over again until power down or reset
 void loop() {
-	if (GameFinished) return;
-	button.loop();
+	if (GameFinished) return; //Spiel ist fertig, Neustarten um nochmal zu spielen
+
 	Joystick.loop();
 
 
 	PrevHiddenWord = HiddenWord;
 
 
-	if (Joystick.isPressed())
+	if (Joystick.isPressed()) //Buchstabe wurde ausgewählt
 	{
 		CheckForMatch(AvailableLetters.charAt(currentindex), WordToGuess, HiddenWord, AvailableLetters, WonGame);
-		currentindex = 0;
+		currentindex = 0; 
 	}
 
+	int AmountVRx = analogRead(VRx); //JOystick auf der X-Achse
 
-
-	int AmountVRx = analogRead(VRx);
-
-	if (AmountVRx >= 800)
+	if (AmountVRx >= 800) //Joystick nach oben
 	{
 		CurrentJoystickStatus = HIGH;
-	}else if (AmountVRx <= 300)
+	}else if (AmountVRx <= 300) //Joystick nach unten
 	{
 		CurrentJoystickStatus = LOW;
-	}else
+	}else //Joystick nicht auf der X-Achse Bewegt
 	{
 		CurrentJoystickStatus = IDLE;
 	}
 
-	if (Serial.available())
-	{
-		char PCInput = static_cast<char>(Serial.read());
 
-		if (PCInput >= 'a' && PCInput <= 'z' || PCInput >= 'A' && PCInput <= 'Z')
-		{
-			currentindex =  PCInput - 'a';
-		}
-	}
-
-	
-
-	lcd.setCursor(9, 0);
-	lcd.print(AmountVRx);
-
-
-	if (CurrentJoystickStatus != IDLE && PrevJoystickStatus == IDLE)
+	if (CurrentJoystickStatus != IDLE && PrevJoystickStatus == IDLE) //Der Joystick wurde entweder nach oben oder nach unten bewegt
 	{
 		PrevJoystickStatus = CurrentJoystickStatus;
 
 		
-		if (CurrentJoystickStatus == HIGH)
+		if (CurrentJoystickStatus == HIGH) //Nach Oben
 		{
 			currentindex++;
 			if (currentindex > (int)AvailableLetters.length() - 1) currentindex = 0;
 		}
-		else
+		else //Nach unten
 		{
 			currentindex--;
 			if (currentindex < 0) currentindex = (int)AvailableLetters.length() - 1;
 		}
 		
 	}
-	else if (CurrentJoystickStatus == IDLE)
+	else if (CurrentJoystickStatus == IDLE) //IDLE
 	{
 		PrevJoystickStatus = IDLE;
 	}
 
 
 	lcd.setCursor(15, 1);
-	lcd.print(AvailableLetters.charAt(currentindex));
+	lcd.print(AvailableLetters.charAt(currentindex)); //Zeigt den gerade ausgewählten BUchstabe auf dem lcd Display an
 
-	if (PrevHiddenWord != HiddenWord)
+	if (PrevHiddenWord != HiddenWord) //Falls Hiddenword sich geändert hat, aktualisiere ausgabe auf lcd
 	{
 		lcd.setCursor(0, 0);
 		lcd.print(HiddenWord);
 	}
 
 
-
-
-	/*if (((millis() - lastmillis) >= 1000))
-	{
-		lastmillis = millis();
-		lcd.setCursor(0, 1);
-		lcd.write(byte(n));
-		n++;
-		if (n == 8) n = 1;
-	}*/
-
-	if (Fehler > 0)
+	if (Fehler > 0) //Zeichnet Hangman, abhängig der Anzahl der Fehler
 	{
 		lcd.setCursor(0, 1);
 		lcd.write(byte(Fehler));
-		if (Fehler > 7)
+		if (Fehler > 7) //Spiel Verloren
 		{
 			lcd.clear();
 			lcd.setCursor(0, 0);
@@ -335,7 +299,7 @@ void loop() {
 			GameFinished = true;
 		}
 	}
-	if (WonGame)
+	if (WonGame) //Spiel gewonnen
 	{
 		lcd.clear();
 		lcd.setCursor(0, 0);
